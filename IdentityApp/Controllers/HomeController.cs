@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IdentityApp.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,16 +14,18 @@ namespace IdentityApp.Controllers
             return View();
         }
 
-        public ActionResult About()
+        [ClaimsAuthorize(Age = 18)]
+        public ActionResult EighteenPlus()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "18+.";
 
             return View();
         }
-
-        public ActionResult Contact()
+        
+        [ClaimsAuthorize(Age = 22)]
+        public ActionResult TwentyTwoPlus()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "22+";
 
             return View();
         }

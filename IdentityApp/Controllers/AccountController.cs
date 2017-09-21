@@ -1,5 +1,6 @@
 ﻿using IdentityApp.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using System;
@@ -9,6 +10,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
 
 namespace IdentityApp.Controllers
 {
@@ -40,15 +42,28 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = new ApplicationUser { UserName = model.Email, Email = model.Email, Year = model.Year };
+                ApplicationUser user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 IdentityResult result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Login", "Account");
+                    var identityClaim = new IdentityUserClaim { ClaimType = "Year", ClaimValue = model.Year.ToString() };
+
+                    user.Claims.Add(identityClaim);
+
+                    await UserManager.UpdateAsync(user);
+
+                    ClaimsIdentity claim = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                    AuthenticationManager.SignOut();
+                    AuthenticationManager.SignIn(new AuthenticationProperties
+                    {
+                        IsPersistent = true
+                    }, claim);
+
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
-                    foreach(string error in result.Errors)
+                    foreach (string error in result.Errors)
                     {
                         ModelState.AddModelError("", error);
                     }

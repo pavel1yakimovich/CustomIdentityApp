@@ -1,15 +1,26 @@
-﻿using Microsoft.AspNet.Identity.EntityFramework;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace IdentityApp.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public int Year { get; set; }
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
+        {
+            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
 
-        public ApplicationUser() { }
+            var yearClaim = Claims.FirstOrDefault(c => c.ClaimType == "Year");
+            if (!ReferenceEquals(yearClaim, null))
+            {
+                userIdentity.AddClaim(new Claim(yearClaim.ClaimType, yearClaim.ClaimValue));
+            }
+            return userIdentity;
+        }
     }
 }
