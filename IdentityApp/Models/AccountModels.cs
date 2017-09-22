@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using IdentityApp.Infrastructure;
 using System.Web;
 
 namespace IdentityApp.Models
@@ -12,6 +12,7 @@ namespace IdentityApp.Models
         public string Email { get; set; }
 
         [Required]
+        [CheckAge]
         public int Year { get; set; }
 
         [Required]
